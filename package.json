@@ -1,0 +1,14 @@
+{
+  "name": "skilift-api",
+  "version": "1.0.0",
+  "description": "api for skilift",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alec Caputo",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  }
+}
