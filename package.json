@@ -4,11 +4,20 @@
   "description": "api for skilift",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node --experimental-modules server.mjs"
   },
   "author": "Alec Caputo",
-  "license": "MIT",
+  "license": "ISC",
   "devDependencies": {
     "nodemon": "^1.18.10"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.5",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "http-status-codes": "^1.3.2",
+    "mongodb": "^3.0"
   }
 }
