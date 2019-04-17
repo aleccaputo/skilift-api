@@ -3,6 +3,7 @@ import {hashPassword, validatePost} from "../services/user-service";
 //import * as HttpStatus from 'http-status-codes'
 import {InvalidUserException} from '../exceptions/user-exceptions'
 import UserModel from '../domain/models/UserModel';
+import {createToken} from "../services/auth-service";
 
 export function userRoutes(app, db) {
     app.post('/users', async (req, res) => {
@@ -19,14 +20,16 @@ export function userRoutes(app, db) {
             if(exists) {
                 res.status(409).send({error: 'Conflict. User Exists'});
             }
-            const {result} = await db.collection('users').insert(user);
+            const {result} = await db.collection('users').insertOne(user);
                 if (!result.ok) {
                     res.send({'error': 'An error has occurred'});
                 } else {
-                    res.status(200).send();
+                    const token = createToken(user);
+                    res.status(200).send({token});
                 }
                 console.log(req.body);
         } catch (e) {
+            console.log(e);
             if (e.constructor.name === 'InvalidUserException') {
                 res.status(400).send({error: 'Bad Request'});
             } else {
