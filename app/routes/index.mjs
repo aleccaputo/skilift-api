@@ -1,5 +1,7 @@
 import {userRoutes} from "./user_route";
+import {authRoutes} from "./auth_route";
 
-export function routes(app, db) {
-    userRoutes(app, db);
+export function routes(app) {
+    userRoutes(app);
+    authRoutes(app);
 }

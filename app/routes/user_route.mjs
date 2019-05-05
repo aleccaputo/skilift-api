@@ -3,9 +3,9 @@ import {hashPassword, validatePost} from "../services/user-service";
 //import * as HttpStatus from 'http-status-codes'
 import {InvalidUserException} from '../exceptions/user-exceptions'
 import User from '../domain/schemas/UserModel';
-import {createToken} from "../services/auth-service";
+import {createToken, isAllowedAccess} from "../services/auth-service";
 
-export function userRoutes(app, db) {
+export function userRoutes(app) {
     app.post('/users', async (req, res) => {
         try {
             validatePost(req.body);
@@ -42,6 +42,17 @@ export function userRoutes(app, db) {
     });
 
     app.get('/users/:username', async (req, res) => {
+        const token = req.headers['x-access-token'];
+        if(!token) {
+            return res.status(403).send({error: "Token required"});
+        }
+        try{
+            isAllowedAccess(token);
+        }
+        catch(e) {
+            return res.status(401).send({error: "Unauthorized"});
+        }
+
         try {
             const {username} = req.params;
             if (!username) {

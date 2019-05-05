@@ -14,7 +14,7 @@ mongoose.connect(uri, {useNewUrlParser: true});
 const skilift = mongoose.connection;
 skilift.on('error', console.error.bind(console, 'connection error:'));
 skilift.once('open', () => {
-    routes(app, skilift);
+    routes(app);
     app.listen(port, () => {
         console.log('We are live on ' + port);
     });
