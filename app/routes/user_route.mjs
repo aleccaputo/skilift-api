@@ -11,8 +11,8 @@ export function userRoutes(app) {
             validatePost(req.body);
 
             const exists = await User.find({'username': req.body.username}).count() > 0;
-            if(exists) {
-                res.status(409).send({error: 'Conflict. User Exists'});
+            if (exists) {
+                return res.status(409).send({error: 'Conflict. User Exists'});
             }
 
             const passwordHash = await hashPassword(req.body.password);
@@ -23,14 +23,13 @@ export function userRoutes(app) {
                 lastName: req.body.lastName
             });
 
-            const {result} = await User.insertOne(user);
-                if (!result.ok) {
-                    res.send({'error': 'An error has occurred'});
-                } else {
-                    const token = createToken(user);
-                    res.status(200).send({token});
-                }
-                console.log(req.body);
+            const result = await user.save();
+            if (result.errors) {
+               return res.send({'error': 'An error has occurred'});
+            } else {
+                const token = createToken(user);
+                return res.status(200).send({token});
+            }
         } catch (e) {
             console.log(e);
             if (e.constructor.name === 'InvalidUserException') {
@@ -43,25 +42,27 @@ export function userRoutes(app) {
 
     app.get('/users/:username', async (req, res) => {
         const token = req.headers['x-access-token'];
-        if(!token) {
+        if (!token) {
             return res.status(403).send({error: "Token required"});
         }
-        try{
+
+        try {
             isAllowedAccess(token);
-        }
-        catch(e) {
+        } catch (e) {
             return res.status(401).send({error: "Unauthorized"});
         }
 
         try {
             const {username} = req.params;
             if (!username) {
-                res.status(400).send({error: 'Bad Request. userId required'});
+                return res.status(400).send({error: 'Bad Request. userId required'});
             }
+
             const user = await User.findByUsername(username);
-            if(user) {
-                res.status(200).send({firstName: user.firstName});
+            if (user) {
+                return res.status(200).send({firstName: user.firstName});
             }
+            return res.status(404).send({error: "Not Found"});
         } catch (e) {
             res.status(500).send({error: 'Server Error'});
         }

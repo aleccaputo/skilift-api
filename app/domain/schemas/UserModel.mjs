@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
     },
     password: String,
     firstName: String,
-    lastName: String
+    lastName: String,
+    vehicle: String,
+    seats: String,
 });
 
 userSchema.statics.findByUsername = async function(username){
