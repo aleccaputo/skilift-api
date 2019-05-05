@@ -1,5 +1,5 @@
 import express from 'express';
-import MongoClient from 'mongodb';
+import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 const app = express();
 import {db} from "./config/db";
@@ -10,12 +10,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const uri = db.url;
-MongoClient.connect(uri, (err, database) => {
-    if (err) return console.log(err);
-    // Make sure you add the database name and not the collection name
-    const skilift = database.db("skilift");
+mongoose.connect(uri, {useNewUrlParser: true});
+const skilift = mongoose.connection;
+skilift.on('error', console.error.bind(console, 'connection error:'));
+skilift.once('open', () => {
     routes(app, skilift);
     app.listen(port, () => {
         console.log('We are live on ' + port);
     });
 });
+

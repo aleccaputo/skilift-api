@@ -2,25 +2,28 @@ import {hashPassword, validatePost} from "../services/user-service";
 // this doesn't work with import yet...
 //import * as HttpStatus from 'http-status-codes'
 import {InvalidUserException} from '../exceptions/user-exceptions'
-import UserModel from '../domain/models/UserModel';
+import User from '../domain/schemas/UserModel';
 import {createToken} from "../services/auth-service";
 
 export function userRoutes(app, db) {
     app.post('/users', async (req, res) => {
         try {
             validatePost(req.body);
-            const passwordHash = await hashPassword(req.body.password);
-            const user = new UserModel();
-            user.username = req.body.username;
-            user.password = passwordHash;
-            user.firstName = req.body.firstName;
-            user.lastName = req.body.lastName;
 
-            const exists = await db.collection('users').find({'username': user.username}).limit(1).count() > 0;
+            const exists = await User.find({'username': req.body.username}).count() > 0;
             if(exists) {
                 res.status(409).send({error: 'Conflict. User Exists'});
             }
-            const {result} = await db.collection('users').insertOne(user);
+
+            const passwordHash = await hashPassword(req.body.password);
+            const user = new User({
+                username: req.body.username,
+                password: passwordHash,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName
+            });
+
+            const {result} = await User.insertOne(user);
                 if (!result.ok) {
                     res.send({'error': 'An error has occurred'});
                 } else {
@@ -44,7 +47,7 @@ export function userRoutes(app, db) {
             if (!username) {
                 res.status(400).send({error: 'Bad Request. userId required'});
             }
-            const user = await db.collection('users').findOne({"username": username});
+            const user = await User.findByUsername(username);
             if(user) {
                 res.status(200).send({firstName: user.firstName});
             }
