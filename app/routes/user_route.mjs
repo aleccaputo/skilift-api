@@ -38,11 +38,15 @@ export function userRoutes(app, db) {
         }
     });
 
-    app.get('/users/:userId', async (req, res) => {
+    app.get('/users/:username', async (req, res) => {
         try {
-            const {userId} = req.params.userId;
-            if (!userId) {
+            const {username} = req.params;
+            if (!username) {
                 res.status(400).send({error: 'Bad Request. userId required'});
+            }
+            const user = await db.collection('users').findOne({"username": username});
+            if(user) {
+                res.status(200).send({firstName: user.firstName});
             }
         } catch (e) {
             res.status(500).send({error: 'Server Error'});
