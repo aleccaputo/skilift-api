@@ -26,6 +26,7 @@ export function postRoutes(app) {
             body: body.body,
             seatsLeft: body.seatsLeft
         });
+
         try {
             const result = await post.save();
             if (result.errors) {
@@ -37,4 +38,30 @@ export function postRoutes(app) {
             return res.status(500).send({error: "server error"});
         }
     });
+
+    app.get('/posts', async(req, res) => {
+        // todo
+        return res.status(404).send({error: "Method Not Implemented"});
+    });
+
+    app.get('/posts/username/:username', async(req, res) => {
+        // todo
+        return res.status(404).send({error: "Method Not Implemented"});
+    });
+
+    app.get('/posts/id/:postId', async(req, res) => {
+        // todo
+        return res.status(404).send({error: "Method Not Implemented"});
+    });
+
+    app.put('/posts', async(req, res) => {
+       // todo
+        return res.status(404).send({error: "Method Not Implemented"});
+    });
+
+    app.delete('/posts', async(req, res) => {
+        // todo
+        return res.status(404).send({error: "Method Not Implemented"});
+    });
+
 }
