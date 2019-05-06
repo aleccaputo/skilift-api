@@ -1,5 +1,5 @@
 import {validate} from "../services/post-service";
-import {isAllowedAccess} from "../services/auth-service";
+import {isAllowedAccessToUserData} from "../services/auth-service";
 import Post from '../domain/schemas/PostModel';
 
 export function postRoutes(app) {
@@ -8,12 +8,12 @@ export function postRoutes(app) {
         if(!token) {
             return res.status(403).send();
         }
+        const {body} = req;
         try {
-            isAllowedAccess(token);
+            isAllowedAccessToUserData(token, body.username);
         } catch(e) {
             return res.status(401).send();
         }
-        const {body} = req;
         const isValid = validate(body);
         if(!isValid) {
             return res.status(400).send();
