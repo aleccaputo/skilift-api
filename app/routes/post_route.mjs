@@ -1,5 +1,5 @@
 import {validate} from "../services/post-service";
-import {isAllowedAccessToUserData} from "../services/auth-service";
+import {isAllowedAccessToUserData, isAllowedAccess} from "../services/auth-service";
 import Post from '../domain/schemas/PostModel';
 
 export function postRoutes(app) {
@@ -10,7 +10,7 @@ export function postRoutes(app) {
         }
         const {body} = req;
         try {
-            isAllowedAccessToUserData(token, body.username);
+            isAllowedAccessToUserData(token);
         } catch(e) {
             return res.status(401).send();
         }
@@ -40,8 +40,22 @@ export function postRoutes(app) {
     });
 
     app.get('/posts', async(req, res) => {
-        // todo
-        return res.status(404).send({error: "Method Not Implemented"});
+        const token = req.headers['x-access-token'];
+        if(!token) {
+            return res.status(403).send();
+        }
+        try {
+            isAllowedAccess(token);
+        } catch(e) {
+            return res.status(401).send();
+        }
+
+        try {
+            const posts = await Post.find({}, null, {take: 10, skip: 0}).sort({createdAt: 'desc'}).lean();
+            return res.status(200).send({posts});
+        } catch(e) {
+            return res.status(500).send({error: 'unable to get posts'});
+        }
     });
 
     app.get('/posts/username/:username', async(req, res) => {
