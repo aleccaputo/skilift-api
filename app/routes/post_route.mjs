@@ -59,8 +59,24 @@ export function postRoutes(app) {
     });
 
     app.get('/posts/username/:username', async(req, res) => {
-        // todo
-        return res.status(404).send({error: "Method Not Implemented"});
+        const token = req.headers['x-access-token'];
+        if(!token) {
+            return res.status(403).send();
+        }
+
+        const {username} = req.params;
+        try {
+            isAllowedAccessToUserData(token, username);
+        } catch(e) {
+            return res.status(401).send();
+        }
+
+        try {
+            const posts = await Post.find({username}, null, {take: 10, skip: 0}).sort({createdAt: 'desc'}).lean();
+            return res.status(200).send({posts});
+        } catch(e) {
+            return res.status(500).send({error: 'unable to get posts'});
+        }
     });
 
     app.get('/posts/id/:postId', async(req, res) => {
